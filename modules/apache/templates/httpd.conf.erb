@@ -1,0 +1,99 @@
+# puppet/templates/webserver/httpd.conf.erb
+# Apache HTTP Server Configuration Template for Rocky Linux 8
+
+ServerRoot "/etc/httpd"
+
+# Listen on port 80
+Listen 80
+
+# Dynamic Shared Object (DSO) Support
+Include conf.modules.d/*.conf
+
+# User and Group for Apache processes
+User apache
+Group apache
+
+# Server Administrator email
+ServerAdmin root@localhost
+
+# Server Name (change this to your domain)
+#ServerName www.example.com:80
+
+# Deny access to the entirety of your server's filesystem
+<Directory />
+    AllowOverride none
+    Require all denied
+</Directory>
+
+# DocumentRoot: The directory out of which you will serve your documents
+DocumentRoot "/mnt/ebs/"
+
+# Relax access to content within /mnt/ebs/.
+<Directory /mnt/ebs/>
+    AllowOverride None
+    # Allow open access:
+    Require all granted
+</Directory>
+
+# Further relax access to the default document root:
+<Directory /mnt/ebs/>
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# DirectoryIndex: sets the file that Apache will serve if a directory is requested
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+
+# Prevent access to .htaccess and .htpasswd files
+<Files ".ht*">
+    Require all denied
+</Files>
+
+# Error and Access Logs
+ErrorLog "logs/error_log"
+LogLevel warn
+
+<IfModule log_config_module>
+    LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%h %l %u %t \"%r\" %>s %O" common
+
+    <IfModule logio_module>
+      LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+    </IfModule>
+
+    CustomLog "logs/access_log" combined
+</IfModule>
+
+# CGI Scripts (if needed)
+<IfModule alias_module>
+    ScriptAlias /cgi-bin/ "/var/www/cgi-bin/"
+</IfModule>
+
+<Directory "/var/www/cgi-bin">
+    AllowOverride None
+    Options None
+    Require all granted
+</Directory>
+
+# MIME Type configuration
+<IfModule mime_module>
+    TypesConfig /etc/mime.types
+    AddType application/x-compress .Z
+    AddType application/x-gzip .gz .tgz
+    AddType text/html .shtml
+    AddOutputFilter INCLUDES .shtml
+</IfModule>
+
+# MIMEMagicFile configuration
+AddDefaultCharset UTF-8
+
+# EnableMMAP and EnableSendfile: On systems that support it, 
+# memory-mapping or the sendfile syscall may be used to deliver files
+EnableMMAP off
+EnableSendfile on
+
+# Load additional configuration files
+IncludeOptional conf.d/*.conf

@@ -1,0 +1,9 @@
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.zip
+*.tar.gz
+/VSCode-linux-x64/
+/temp/
