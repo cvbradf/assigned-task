@@ -7,3 +7,7 @@ crash.log
 *.tar.gz
 /VSCode-linux-x64/
 /temp/
+awscliv2.zip*
+**/eks/aws/
+node_modules/
+**/eks/aws*/
